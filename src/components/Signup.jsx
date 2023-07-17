@@ -10,7 +10,7 @@ const Signup = () => {
   const passwordRef = useRef(null);
   const confirmPasswordRef = useRef(null);
   const roleRef = useRef(null);
-  const location = useRef(null);
+  const locationRef = useRef(null);
   const navigate = useNavigate();
   const [alertMessage, setAlertMessage] = useState('');
   const [alertType, setAlertType] = useState('');
@@ -76,7 +76,7 @@ const Signup = () => {
       const firstName = firstNameRef.current.value;
       const lastName = lastNameRef.current.value;
       const role = roleRef.current.value;
-      const location = location.current.value;
+      const location = locationRef.current.value;
   
       // Check if passwords match
       if (password !== confirmPassword) {
@@ -232,7 +232,7 @@ const Signup = () => {
                 type="text"
                 className="form-control"
                 id="location"
-                ref={location}
+                ref={locationRef}
                 required
               />
             </div>
