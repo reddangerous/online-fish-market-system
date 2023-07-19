@@ -4,6 +4,8 @@ import { BrowserRouter, Route, Routes } from 'react-router-dom';
 import SellerProfile from './components/SellerProfile';
 import FishList from './components/FishList';
 import Orders from './components/Orders';
+import SellerOrders from './components/SellerOrders';
+import AdminDashboard from './Admin/AdminDashboard';
 function App() {
   return (
   <BrowserRouter>
@@ -14,6 +16,8 @@ function App() {
       <Route path='/seller/:id' element= {<SellerProfile />} />
       <Route path='/buyer/:id' element= {<FishList />} />
       <Route path='/order-details/:orderId' element= {<Orders />} />
+      <Route path='/seller-details/:sellerId' element= {<SellerOrders />} />
+      <Route path='/admin' element= {<AdminDashboard />} />
       </Routes>
       </BrowserRouter>
   );

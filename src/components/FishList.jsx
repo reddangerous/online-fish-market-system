@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
-import { Link ,useNavigate} from 'react-router-dom';
+import {useNavigate} from 'react-router-dom';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faShoppingCart, faPlus, faMinus, faUser } from '@fortawesome/free-solid-svg-icons';
+import { faShoppingCart, faPlus, faMinus } from '@fortawesome/free-solid-svg-icons';
 import supabase from '../supabase';
 import { useParams } from 'react-router-dom';
 import { v4 as uuidv4} from 'uuid';
@@ -48,29 +48,34 @@ const FishList = () => {
   const fetchLocation = async () => {
     try {
       // Fetch location data from users table
-      const { data: locationData, error } = await supabase.from('users').select('id, location');
+      const { data: locationData, error } = await supabase.from('users').select('id, location, phone');
       if (error) {
         console.error('Error fetching location data:', error);
       } else {
         // Create a map of UserId to location for quick access
         const locationMap = {};
+        const phoneMap = {};
         locationData.forEach((location) => {
           locationMap[location.id] = location.location;
         });
-
+        locationData.forEach((phone) => {
+          phoneMap[phone.id] = phone.phone;
+        });
         // Add location data to each fish object
         const fishDataWithLocation = fishList.map((fish) => ({
           ...fish,
-          location: locationMap[fish.UserId] || '', // Empty string if location not found
+          location: locationMap[fish.UserId] || '',
+          phone: phoneMap[fish.UserId] || '',
         }));
 
-        setFishListWithLocation(fishDataWithLocation); // Set the fishList with location data
+        setFishListWithLocation(fishDataWithLocation);
       }
     } catch (error) {
       console.error('Error fetching location data:', error.message);
     }
   };
-
+    
+  
    
   const fetchFishData = async () => {
     try {
@@ -150,6 +155,7 @@ const FishList = () => {
         fishPrice: fish.price,
         quantity: fish.quantity,
         total: fish.price * fish.quantity,
+        sellerId: fish.UserId, // Store the sellerId as a single value, not an array
       }));
   
       // Insert the order data into the order table
@@ -161,14 +167,14 @@ const FishList = () => {
         // Clear the cart after placing the order
         setCart([]);
   
-        // Create a single order entry in the user_orders table
+        // Create a single order entry in the user_orders table with the sellerId as an array
         const orderEntry = {
-          sellerId: fishList[0].UserId,
           userId: id,
           orderId: orderId,
-          orderDate: new Date().toISOString(), // Add the order date if needed
+          orderDate: new Date().now.getHours().toISOString(), // Add the order date if needed
           // Add any other relevant columns for user_orders table
         };
+  
         const { data: userOrderData, error: userOrderError } = await supabase.from('user_orders').insert([orderEntry]);
         if (userOrderError) {
           console.error('Error inserting user_orders data:', userOrderError);
@@ -180,6 +186,7 @@ const FishList = () => {
       console.error('Error placing order:', error.message);
     }
   };
+
 
   const handlePhoneNumberChange = (e) => {
     setPhoneNumber(e.target.value);
@@ -229,7 +236,7 @@ const FishList = () => {
 
   
   return (
-    <div className="container mt-4">
+    <div className="container">
       <div className="row">
         <div className="col-12 col-md-6">
           {user.map((user) => (
@@ -244,8 +251,11 @@ const FishList = () => {
                   <img src={fish.fishImage} className="card-img-top" alt={fish.productDetails} />
                   <div className="card-body">
                     <h5 className="card-title">{fish.productDetails}</h5>
-                    <p className="card-text">Price: ${fish.price}</p>
+                    <p className="card-text">Price: KSH {fish.price}</p>
                     <p className="card-text">Location: {fish.location}</p>
+                    <p className="card-text">
+          Seller phone: <a href={`tel:${fish.phone}`}>{fish.phone}</a>
+        </p>
                     <div className="d-flex align-items-center">
                       <button className="btn btn-orange me-2" onClick={() => handleAddToCart(fish.id)}>
                         <FontAwesomeIcon icon={faPlus} />
@@ -299,8 +309,8 @@ const FishList = () => {
                   <tr key={item.fishId}>
                     <td>{item.productDetails}</td>
                     <td>{item.quantity}</td>
-                    <td>${item.price}</td>
-                    <td>${item.price * item.quantity}</td>
+                    <td>KSH{item.price}</td>
+                    <td>KSH{item.price * item.quantity}</td>
                   </tr>
                 ))}
               </tbody>
@@ -340,7 +350,6 @@ const FishList = () => {
             <th>Order ID</th>
             <th>Date</th>
             <th>View</th>
-            <th>Seller Id</th>
           </tr>
         </thead>
         <tbody>
@@ -359,11 +368,6 @@ const FishList = () => {
                 
               </td>
               <td>
-              <>
-                {fishList.map((fish) => (
-                  <td>{fish.UserId}</td>  
-                ))}
-                </>
               </td>
             </tr>
           ))}
@@ -373,6 +377,7 @@ const FishList = () => {
           </div>
         </div>
       </div>
+    
 
   );
 };

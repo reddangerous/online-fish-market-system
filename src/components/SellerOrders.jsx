@@ -2,8 +2,9 @@ import { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import supabase from '../supabase'; // Replace with your Supabase client import
 
-const Orders = () => {
+const SellerOrders = () => {
   const { orderId } = useParams();
+  const{sellerId} = useParams();
   const [order, setOrder] = useState([]);
   const [isApprovedMap, setIsApprovedMap] = useState([]); // State to track approved status for each order item
 
@@ -17,8 +18,7 @@ const Orders = () => {
       const { data, error } = await supabase
         .from('order')
         .select('*')
-        .eq('orderId', orderId)
-
+        .eq('sellerId', sellerId);
   
       if (error) {
         console.error('Error fetching order details:', error);
@@ -99,4 +99,4 @@ const Orders = () => {
   );
 };
 
-export default Orders;
+export default SellerOrders;

@@ -33,8 +33,11 @@ const Login = () => {
             navigate(`/buyer/${id}`);
           } else if (role === 'seller') {
             navigate(`/seller/${id}`);
+          }else  if (role === 'admin'){
+            navigate(`/admin`);
           }
-
+          
+          
           setAlertMessage('Login successful!');
           setAlertType('success');
         } else {

@@ -120,7 +120,7 @@ const Signup = () => {
  
       setAlertMessage('Signup successful!');
       setAlertType('success');
-      navigate('/signup');
+      navigate('/login');
     } catch (error) {
       console.error(error);
       setAlertMessage('Signup failed. Please try again later.');
