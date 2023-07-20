@@ -171,7 +171,7 @@ const FishList = () => {
         const orderEntry = {
           userId: id,
           orderId: orderId,
-          orderDate: new Date().now.getHours().toISOString(), // Add the order date if needed
+          orderDate: new Date().toISOString(), // Add the order date if needed
           // Add any other relevant columns for user_orders table
         };
   

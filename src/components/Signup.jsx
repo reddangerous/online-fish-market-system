@@ -16,56 +16,54 @@ const Signup = () => {
   const [alertType, setAlertType] = useState('');
   const [isEmailSent, setIsEmailSent] = useState(false);
   const [isEmailVerified, setIsEmailVerified] = useState(false);
+  
 
-  const handleSendOTP = async (e) => {
-    e.preventDefault();
-    try {
-      // Send OTP to verify email
-      const { error: otpError } = await supabase.auth.signInWithOtp({
-        email: emailRef.current.value,
-      });
-      if (otpError) {
-        console.error(otpError);
-        setAlertMessage('Failed to send OTP. Please try again later.');
-        setAlertType('danger');
-        return;
-      }
-
+  const handleSendOTP = async () => {
+    const response = await fetch('http://localhost:12345/sendOtp', { 
+      method: 'POST', 
+      mode: 'cors',
+      headers: { 
+        'Content-Type': 'application/json' 
+      }, 
+      body: JSON.stringify({ email: emailRef.current.value }) 
+    });
+  
+    const data = await response.json();
+  
+    if (response.ok) {
       setIsEmailSent(true);
-      setAlertMessage('An OTP has been sent to your email. Please check your inbox.');
+      setAlertMessage(data.message);
       setAlertType('success');
-    } catch (error) {
-      console.error(error);
-      setAlertMessage('Failed to send OTP. Please try again later.');
+    } else {
+      console.error(data.message);
+      setAlertMessage(data.message);
       setAlertType('danger');
     }
-  };
-
-  const handleVerifyOTP = async (e) => {
-    e.preventDefault();
-    try {
-      // Verify email using OTP
-      const { error: otpError } = await supabase.auth.verifyOtp({
-        email: emailRef.current.value,
-        token: otpRef.current.value,
-        type: 'email',
-      });
-      if (otpError) {
-        console.error(otpError);
-        setAlertMessage('Email verification failed. Please check the OTP and try again.');
-        setAlertType('danger');
-        return;
-      }
-
+  }
+  
+  const handleVerifyOTP = async () => {
+    const response = await fetch('http://localhost:12345/verifyOtp', { 
+      method: 'POST', 
+      mode: 'cors',
+      headers: { 
+        'Content-Type': 'application/json' 
+      }, 
+      body: JSON.stringify({ otp: otpRef.current.value, email: emailRef.current.value })  
+    });
+  
+    const data = await response.json();
+  
+    if (response.ok) {
       setIsEmailVerified(true);
-      setAlertMessage('Email verified successfully!');
+      setAlertMessage(data.message);
       setAlertType('success');
-    } catch (error) {
-      console.error(error);
-      setAlertMessage('Email verification failed. Please check the OTP and try again.');
+    } else {
+      setAlertMessage(data.message);
       setAlertType('danger');
     }
-  };
+  }
+  
+
 
   const handleSignupSubmit = async (e) => {
     e.preventDefault();
